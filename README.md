@@ -186,8 +186,8 @@ MIT
 
 <div align="center">
 
-**⭐ Si te gustó este proyecto, dale una estrella ⭐**
+**⭐ Espero que les guste este prueba Tecnica ⭐**
 
-Hecho con ❤️ usando Next.js y Open Library API
+Hecho con ❤️ usando React y Next.js y Open Library API
 
 </div>
