@@ -4,7 +4,7 @@ import BookDetailsClient from "./BookDetailsClient";
 import { Metadata } from "next";
 
 interface BookDetailsPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 // Configuración de caché: revalidar cada 24 horas
@@ -14,7 +14,8 @@ export async function generateMetadata({
   params,
 }: BookDetailsPageProps): Promise<Metadata> {
   try {
-    const book = await getBookDetails(params.id);
+    const { id } = await params;
+    const book = await getBookDetails(id);
     return {
       title: `${book.title} - Book Search App`,
       description: book.description || `${book.title} por ${book.author.join(", ")}`,
@@ -29,11 +30,12 @@ export async function generateMetadata({
 export default async function BookDetailsPage({
   params,
 }: BookDetailsPageProps) {
+  const { id } = await params;
   let book: Book | null = null;
   let error: string | null = null;
 
   try {
-    book = await getBookDetails(params.id);
+    book = await getBookDetails(id);
   } catch (e) {
     error = e instanceof Error ? e.message : "No se pudo cargar el libro";
     console.error("Book details error:", e);

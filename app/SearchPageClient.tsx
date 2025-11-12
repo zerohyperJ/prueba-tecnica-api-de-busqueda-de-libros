@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useBookStore } from "@/lib/store/useBookStore";
+import { searchBooks } from "@/lib/api/openLibrary";
 import { Book } from "@/lib/types/book";
 import SearchBar from "@/components/SearchBar";
 import BookCard from "@/components/BookCard";
@@ -18,21 +19,73 @@ export default function SearchPageClient({
   initialQuery,
   error: initialError,
 }: SearchPageClientProps) {
-  const { searchResults, isLoading, error, searchTerm, setSearchResults, setError, setSearchTerm } =
-    useBookStore();
+  const { 
+    searchResults, 
+    isLoading, 
+    error, 
+    searchTerm, 
+    setSearchResults, 
+    setError, 
+    setSearchTerm,
+    setLoading 
+  } = useBookStore();
+  
+  const [searchCompleted, setSearchCompleted] = useState(false);
+  const [initialized, setInitialized] = useState(false);
 
-  // Sync initial server-side data with store only if we have new data
+  // Sync initial server-side data with store (only once)
   useEffect(() => {
-    // Only update if we have initial results from server
-    if (initialQuery && initialResults.length > 0) {
-      setSearchResults(initialResults);
+    if (!initialized && initialQuery) {
       setSearchTerm(initialQuery);
+      if (initialResults.length > 0) {
+        setSearchResults(initialResults);
+        setSearchCompleted(true);
+      } else if (initialError) {
+        setError(initialError);
+        setSearchCompleted(true);
+      } else {
+        // SSR returned empty results, mark as completed
+        setSearchCompleted(true);
+      }
+      setInitialized(true);
     }
-    // Set error if exists
-    if (initialError) {
-      setError(initialError);
+  }, [initialized, initialQuery, initialResults, initialError, setSearchResults, setError, setSearchTerm]);
+
+  // Perform client-side search when searchTerm changes
+  useEffect(() => {
+    const performSearch = async () => {
+      if (!searchTerm || searchTerm.trim() === "") {
+        setSearchResults([]);
+        setSearchCompleted(false);
+        return;
+      }
+
+      // Skip if this is the initial query and we already have data from SSR
+      if (searchTerm === initialQuery && initialized) {
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+      setSearchCompleted(false);
+
+      try {
+        const results = await searchBooks(searchTerm);
+        setSearchResults(results);
+        setSearchCompleted(true);
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : "Error al buscar libros";
+        setError(errorMessage);
+        setSearchResults([]);
+        setSearchCompleted(true);
+      }
+    };
+
+    // Only search if searchTerm is different from initialQuery or not initialized yet
+    if (searchTerm && (searchTerm !== initialQuery || !initialized)) {
+      performSearch();
     }
-  }, [initialQuery, initialResults, initialError, setSearchResults, setError, setSearchTerm]);
+  }, [searchTerm, initialQuery, initialized, setSearchResults, setError, setLoading]);
 
   // Show results from store if available, otherwise show initial results
   const displayResults = searchResults.length > 0 ? searchResults : initialResults;
@@ -61,7 +114,7 @@ export default function SearchPageClient({
           </div>
         )}
 
-        {!isLoading && !displayError && hasQuery && displayResults.length === 0 && (
+        {!isLoading && !displayError && hasQuery && searchCompleted && displayResults.length === 0 && (
           <div className="max-w-2xl mx-auto bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
             <svg
               className="w-16 h-16 mx-auto text-yellow-500 mb-4"

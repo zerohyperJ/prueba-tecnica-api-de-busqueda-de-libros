@@ -3,14 +3,14 @@ import { Book } from "@/lib/types/book";
 import SearchPageClient from "./SearchPageClient";
 
 interface SearchPageProps {
-  searchParams: { q?: string };
+  searchParams: Promise<{ q?: string }>;
 }
 
 // Configuración de caché: revalidar cada 1 hora
 export const revalidate = 3600;
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
-  const query = searchParams.q;
+  const { q: query } = await searchParams;
   let initialResults: Book[] = [];
   let error: string | null = null;
 

@@ -7,7 +7,8 @@ import {
 
 const BASE_URL = "https://openlibrary.org";
 const COVERS_URL = "https://covers.openlibrary.org/b";
-const REQUEST_TIMEOUT = 5000; // 5 segundos
+const REQUEST_TIMEOUT = 8000; // 8 segundos
+const AUTHOR_TIMEOUT = 3000; // 3 segundos para autores
 
 /**
  * Construye la URL de la imagen de portada desde Open Library
@@ -81,9 +82,10 @@ export async function searchBooks(query: string): Promise<Book[]> {
     const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
 
     const response = await fetch(
-      `${BASE_URL}/search.json?q=${encodeURIComponent(query)}&limit=20`,
+      `${BASE_URL}/search.json?q=${encodeURIComponent(query)}&limit=20&fields=key,title,author_name,cover_i,first_publish_year`,
       {
         signal: controller.signal,
+        next: { revalidate: 3600 }, // Caché de 1 hora
       }
     );
 
@@ -144,15 +146,15 @@ export async function getBookDetails(bookId: string): Promise<Book> {
 
     const data: BookDetails = await response.json();
 
-    // Obtener nombres de autores si están disponibles (límite de 3 para rendimiento)
+    // Obtener nombres de autores si están disponibles (límite de 2 para rendimiento)
     let authorNames: string[] = ["Autor Desconocido"];
     if (data.authors && data.authors.length > 0) {
       try {
-        const authorsToFetch = data.authors.slice(0, 3); // Limitar a 3 autores
+        const authorsToFetch = data.authors.slice(0, 2); // Limitar a 2 autores
         const authorPromises = authorsToFetch.map(async (author) => {
           const authorKey = author.author.key;
           const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 2000); // Timeout de 2 segundos por autor
+          const timeoutId = setTimeout(() => controller.abort(), AUTHOR_TIMEOUT);
           
           try {
             const authorResponse = await fetch(`${BASE_URL}${authorKey}.json`, {
@@ -168,9 +170,13 @@ export async function getBookDetails(bookId: string): Promise<Book> {
           } catch {
             clearTimeout(timeoutId);
           }
-          return "Autor Desconocido";
+          return null;
         });
-        authorNames = await Promise.all(authorPromises);
+        const results = await Promise.all(authorPromises);
+        const validAuthors = results.filter((name): name is string => name !== null);
+        if (validAuthors.length > 0) {
+          authorNames = validAuthors;
+        }
       } catch (error) {
         console.error("Error al obtener detalles de autores:", error);
       }
