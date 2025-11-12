@@ -33,17 +33,17 @@
 ### Página de Búsqueda
 > *Busca libros por título y visualiza resultados con portadas, autores y botón de favoritos*
 
-![Búsqueda de Libros](./public/screenshots/search.png)
+![Búsqueda de Libros](./public/screenshots/search.jpg)
 
 ### Detalles del Libro
 > *Información completa del libro con descripción y opción de agregar a favoritos*
 
-![Detalles del Libro](./public/screenshots/details.png)
+![Detalles del Libro](./public/screenshots/details.jpg)
 
 ### Página de Favoritos
 > *Gestiona tu colección personal de libros favoritos*
 
-![Favoritos](./public/screenshots/favorites.png)
+![Favoritos](./public/screenshots/favorites.jpg)
 
 ---
 
