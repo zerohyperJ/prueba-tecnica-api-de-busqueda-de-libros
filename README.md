@@ -180,7 +180,7 @@ MIT
 
 ## 👨‍💻 Autor
 
-[@zerohyperJ](https://github.com/zerohyperJ)
+[@TulioContreras](https://github.com/zerohyperJ)
 
 ---
 
