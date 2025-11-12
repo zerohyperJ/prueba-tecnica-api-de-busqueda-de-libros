@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)
+![Next.js](https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=for-the-badge&logo=typescript)
 ![Tailwind](https://img.shields.io/badge/Tailwind-3-38bdf8?style=for-the-badge&logo=tailwind-css)
 ![Zustand](https://img.shields.io/badge/Zustand-4-orange?style=for-the-badge)
@@ -15,7 +15,7 @@
 
 ## 📖 Sobre el Proyecto
 
-**SemBook** es una aplicación web desarrollada con Next.js 14 que permite buscar libros usando la API de Open Library, visualizar información detallada y gestionar una lista personalizada de favoritos con persistencia local.
+**SemBook** es una aplicación web desarrollada con Next.js 16 (última versión estable) que permite buscar libros usando la API de Open Library, visualizar información detallada y gestionar una lista personalizada de favoritos con persistencia local.
 
 ### ✨ Características Principales
 
@@ -51,7 +51,7 @@
 
 | Tecnología | Versión | Uso |
 |------------|---------|-----|
-| **Next.js** | 14.x | Framework React con SSR |
+| **Next.js** | 16.x | Framework React con SSR |
 | **TypeScript** | 5.x | Tipado estático |
 | **Zustand** | 4.x | Gestión de estado global |
 | **Tailwind CSS** | 3.x | Estilos y diseño |

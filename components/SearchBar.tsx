@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useBookStore } from "@/lib/store/useBookStore";
 
-export default function SearchBar() {
+function SearchBarContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { setSearchTerm } = useBookStore();
@@ -53,5 +53,31 @@ export default function SearchBar() {
         </button>
       </div>
     </form>
+  );
+}
+
+export default function SearchBar() {
+  return (
+    <Suspense fallback={
+      <div className="w-full max-w-3xl mx-auto mb-8">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            placeholder="Buscar libros por título..."
+            className="flex-1 px-4 py-3 border border-gray-300 rounded-lg"
+            disabled
+          />
+          <button
+            type="button"
+            className="px-6 py-3 bg-gray-400 text-white rounded-lg font-medium cursor-not-allowed"
+            disabled
+          >
+            Buscar
+          </button>
+        </div>
+      </div>
+    }>
+      <SearchBarContent />
+    </Suspense>
   );
 }
